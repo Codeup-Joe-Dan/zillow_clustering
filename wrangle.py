@@ -38,7 +38,7 @@ def get_zillow():
                 SELECT parcelid, bathroomcnt as bathrooms, bedroomcnt as bedrooms,
                                     calculatedfinishedsquarefeet as sqft, 
                                     fips as county, fullbathcnt, latitude, garagecarcnt, garagetotalsqft as garagesqft,
-                                    longitude, lotsizesquarefeet as lotsize, poolcnt, fireplacecnt,
+                                    longitude, lotsizesquarefeet as lotsize, 
                                     rawcensustractandblock as tract, regionidzip, yearbuilt, 
                                     structuretaxvaluedollarcnt as structuretaxvalue, propertylandusedesc,
                                     taxvaluedollarcnt as taxvalue, landtaxvaluedollarcnt as landtaxvalue,
@@ -76,14 +76,9 @@ def prep_zillow(df):
     df.tract = df.tract.astype(str).str[4:8]
     df.tract = df.tract.astype(int)
 
-    # convert fireplace count nulls to 0
-    df.fireplacecnt = df.fireplacecnt.fillna(0)
     # garage null values to 0
     df.garagecarcnt = df.garagecarcnt.fillna(0)
     df.garagesqft = df.garagesqft.fillna(0)
-
-    # convert poolcnt nulls to 0's
-    df.poolcnt = df.poolcnt.fillna(0)
 
     # convert lat and long to proper decimal format
     df['latitude'] = df['latitude'] / 1_000_000
@@ -107,7 +102,10 @@ def prep_zillow(df):
 
     # create absolute error column
     df['abserror'] = abs(df.logerror)
-    
+
+    # create price per sq foot column
+    df['dollarspersqft'] = df.taxvalue / df.sqft
+
     # one-hot encode county
     dummies = pd.get_dummies(df['county'],drop_first=False)
     df = pd.concat([df, dummies], axis=1)
