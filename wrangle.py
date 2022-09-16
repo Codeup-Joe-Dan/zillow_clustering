@@ -37,12 +37,11 @@ def get_zillow():
         df = pd.read_sql('''
                 SELECT parcelid, bathroomcnt as bathrooms, bedroomcnt as bedrooms,
                                     calculatedfinishedsquarefeet as sqft, 
-                                    fips as county, fullbathcnt, latitude, garagecarcnt, garagetotalsqft as garagesqft,
+                                    fips as county, latitude, garagetotalsqft as garagesqft,
                                     longitude, lotsizesquarefeet as lotsize, 
                                     rawcensustractandblock as tract, regionidzip, yearbuilt, 
                                     structuretaxvaluedollarcnt as structuretaxvalue, propertylandusedesc,
-                                    taxvaluedollarcnt as taxvalue, landtaxvaluedollarcnt as landtaxvalue,
-                                    taxamount, logerror
+                                    landtaxvaluedollarcnt as landtaxvalue, taxamount, logerror
                             FROM properties_2017
                             JOIN predictions_2017
                             USING (parcelid)
@@ -97,7 +96,7 @@ def prep_zillow(df):
     # drop rows with zip over 99999
     df= df[df.regionidzip <= 99999]
 
-    # drop property use type that is no longer needed
+    # drop 'propertylanduse' column that is no longer needed
     df.drop(columns=['propertylandusedesc'], inplace=True)
 
     # create absolute error column
@@ -122,7 +121,7 @@ def remove_outliers(df):
     '''
     col_list = ['bathrooms', 'bedrooms', 'sqft', 'fullbathcnt',
        'latitude', 'longitude', 'lotsize',
-       'structuretaxvalue', 'taxvalue', 'landtaxvalue', 'taxamount']
+       'structuretaxvalue', 'landtaxvalue', 'taxamount']
     
     for col in col_list:
 
