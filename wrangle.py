@@ -105,7 +105,9 @@ def prep_zillow(df):
     # drop property use type that is no longer needed
     df.drop(columns=['propertylandusedesc'], inplace=True)
 
-
+    # create absolute error column
+    df['abserror'] = abs(df.logerror)
+    
     # one-hot encode county
     dummies = pd.get_dummies(df['county'],drop_first=False)
     df = pd.concat([df, dummies], axis=1)
