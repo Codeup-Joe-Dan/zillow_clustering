@@ -76,7 +76,6 @@ def prep_zillow(df):
     df.tract = df.tract.astype(int)
 
     # garage null values to 0
-    df.garagecarcnt = df.garagecarcnt.fillna(0)
     df.garagesqft = df.garagesqft.fillna(0)
 
     # convert lat and long to proper decimal format
@@ -103,7 +102,7 @@ def prep_zillow(df):
     df['abserror'] = abs(df.logerror)
 
     # create price per sq foot column
-    df['dollarspersqft'] = df.taxvalue / df.sqft
+    df['dollarspersqft'] = (df.structuretaxvalue + df.landtaxvalue) / df.sqft
 
     # one-hot encode county
     dummies = pd.get_dummies(df['county'],drop_first=False)
@@ -119,7 +118,7 @@ def remove_outliers(df):
 
         returns a dataframe with outliers removed
     '''
-    col_list = ['bathrooms', 'bedrooms', 'sqft', 'fullbathcnt',
+    col_list = ['bathrooms', 'bedrooms', 'sqft',
        'latitude', 'longitude', 'lotsize',
        'structuretaxvalue', 'landtaxvalue', 'taxamount']
     
