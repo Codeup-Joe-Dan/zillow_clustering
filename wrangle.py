@@ -85,6 +85,9 @@ def prep_zillow(df):
     # drop 0 bedroom rows
     df = df[df.bedrooms > 0]
 
+    # drop rows where lot size is smaller than property square footage
+    df = df[df.lotsize > df.sqft]
+
     # drop rows with zip over 99999
     df= df[df.regionidzip <= 99999]
 
