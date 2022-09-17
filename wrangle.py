@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import env
 from sklearn.model_selection import train_test_split
-from datetime import datetime
 
 def get_connection(db, user=env.user, host=env.host, password=env.password):
     '''
@@ -39,7 +38,7 @@ def get_zillow():
                                     calculatedfinishedsquarefeet as sqft, 
                                     fips as county, latitude, garagetotalsqft as garagesqft,
                                     longitude, lotsizesquarefeet as lotsize, 
-                                    rawcensustractandblock as tract, regionidzip, yearbuilt, 
+                                    regionidzip, yearbuilt, 
                                     structuretaxvaluedollarcnt as structuretaxvalue, propertylandusedesc,
                                     landtaxvaluedollarcnt as landtaxvalue, taxamount, logerror
                             FROM properties_2017
@@ -48,10 +47,10 @@ def get_zillow():
                             LEFT JOIN propertylandusetype
                             USING (propertylandusetypeid)
                             HAVING propertylandusedesc = 'Single Family Residential'
-                            ORDER BY transactiondate
+                            ORDER BY transactiondate desc
                     ''', get_connection('zillow'))
 
-    # Remove multiple instances of property, keeping the latest transaction (query was ordered by transaction date)
+    # Remove multiple instances of property, keeping the latest transaction (query was descending ordered by transaction date)
     df = df[~df.duplicated(subset=['parcelid'],keep='last')]
 
     # Write that dataframe to disk for later. This cached file will prevent repeated large queries to the database server.
@@ -65,15 +64,9 @@ def prep_zillow(df):
     
     returns a transformed dataframe with features for exploration and modeling
     '''
-
-
+    
     # create column with fips value converted from an integer to the county name string
     df['county'] = df.county.map({6037 : 'Los Angeles', 6059 : 'Orange', 6111 : 'Ventura'})
-
-    # drop rows with null in tract column, trim FIPS and decimal portion, convert to int
-    df = df[df['tract'].notna()]
-    df.tract = df.tract.astype(str).str[4:8]
-    df.tract = df.tract.astype(int)
 
     # garage null values to 0
     df.garagesqft = df.garagesqft.fillna(0)
