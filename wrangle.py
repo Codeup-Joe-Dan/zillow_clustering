@@ -100,6 +100,7 @@ def prep_zillow(df):
     # create price per sq foot column
     df['dollarspersqft'] = (df.structuretaxvalue + df.landtaxvalue) / df.sqft
 
+
     # one-hot encode county
     dummies = pd.get_dummies(df['county'],drop_first=False)
     df = pd.concat([df, dummies], axis=1)
@@ -153,9 +154,3 @@ def my_split(df):
 
        return train, validate, test
 
-def wrangle_zillow():
-    df = get_zillow() # get the data
-    df = prep_zillow(df) # prep the data
-    df = remove_outliers(df) # remove outliers
-
-    return my_split(df)

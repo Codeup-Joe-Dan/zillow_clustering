@@ -14,6 +14,7 @@ from sklearn.linear_model import LinearRegression, LassoLars, TweedieRegressor
 
 
 
+
 def predict_baseline(train):
     '''
     Function to calculate the RMSE for the mean and median logerror of zillow properties
@@ -48,5 +49,36 @@ def predict_baseline(train):
 
     df_style = results.style.set_table_attributes("style='display:inline; margin-right:100px;'").set_caption("RESULTS")
     display_html(df_style._repr_html_(), raw=True)
+
+    return results
+
+def LRmodel(model, X_train, y_train, X_2, y_2):
+    '''
+    Function to scale variables, fit a model, make predictions on two sets of data, and return a 
+    row of evaluation data
+    Accepts: a model (not fit)
+             a dataframe of X_train data that will be used to fit the model
+             a dataframe of y_train data that will be used to fit the model
+             a second dataframe of X data (can be validate or test) to make predictions
+             a second dataframe of y data (can be validate or test) to evaluate predictions
+    Returns: a list containing the model, the RMSE for train data, the RMSE of the second dataset,
+             and the R2 score of the second dataset
+    '''
+
+    # fit the model object
+    model.fit(X_train, y_train)
+
+    # predict train
+    yhat_train = model.predict(X_train)
+    yhat_2 = model.predict(X_2)
+
+    # evaluate: rmse for train
+    rmse_train = mean_squared_error(y_train, yhat_train)**(1/2)
+
+    # evaluate: rmse for validate (or test if that is what is sent to the function)
+    rmse_2 = mean_squared_error(y_2, yhat_2)**(1/2)
+
+    # format results and save as a list that will be returned
+    newresult = [model,'{:,.4f}'.format(rmse_train),'{:,.4f}'.format(rmse_2), round(r2_score(y_2, yhat_2),4)]
 
     return newresult
