@@ -52,9 +52,9 @@ def predict_baseline(train):
 
     return results
 
-def LRmodel(model, X_train, y_train, X_2, y_2):
+def LRmodel(model, X_train, y_train, X_2, y_2, features):
     '''
-    Function to scale variables, fit a model, make predictions on two sets of data, and return a 
+    Function to fit a model, make predictions on two sets of data, and return a 
     row of evaluation data
     Accepts: a model (not fit)
              a dataframe of X_train data that will be used to fit the model
