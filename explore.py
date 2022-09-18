@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
 import statistics
+from sklearn.cluster import KMeans
+
 
 
 def target_dist(df):
@@ -82,7 +84,7 @@ def lotsize_plot(df):
                    aspect=2, palette="bright", ci=None,
                    edgecolor=".2")
     plt.grid(False)
-    plt.axvline(6000, label = 'Average lotsize', ls='--', color='red')
+    # plt.axvline(6000, label = 'Average lotsize', ls='--', color='red')
     plt.axvspan(-5, 6000, color='green', alpha=0.1)
 
     p.set_ylabels("Log Error")
@@ -105,4 +107,129 @@ def lotsize_plot(df):
     else:
         print("We confirm the Null Hypothesis")
 
-    print(p)
+def find_k(df, cluster_vars):
+    sse = []
+    k_range = range(2,20)
+    for k in k_range:
+        kmeans = KMeans(n_clusters=k)
+
+        kmeans.fit(df[cluster_vars])
+
+        # inertia: Sum of squared distances of samples to their closest cluster center.
+        sse.append(kmeans.inertia_) 
+
+    # create a dataframe with all of our metrics to compare them across values of k: SSE, delta, pct_delta
+    k_comparisons_df = pd.DataFrame(dict(k=k_range[0:-1], 
+                             sse=sse[0:-1]
+                             ))
+
+    # plot k with inertia
+    plt.figure(figsize=(12, 8))
+    plt.rcParams.update({'font.size': 15})
+    plt.plot(k_comparisons_df.k, k_comparisons_df.sse, 'bx-')
+    plt.xlabel('k')
+    plt.ylabel('SSE')
+    plt.title(f'The Elbow Method to find the optimal k\n for {cluster_vars}\nFor which k values do we see large decreases in SSE?')
+    # plt.annotate('Elbow', xy=(5, k_comparisons_df.sse[4]),  
+    #         xytext=(5, 5), textcoords='axes fraction',
+    #         arrowprops=dict(facecolor='red', shrink=0.05),
+    #         horizontalalignment='right', verticalalignment='top',
+            # )
+    plt.show()
+
+    return 
+
+def create_clusters(df, k, cluster_vars):
+    # create kmean object
+    kmeans = KMeans(n_clusters=k, random_state = 123)
+
+    # fit to train and assign cluster ids to observations
+    kmeans.fit(df[cluster_vars])
+
+    return kmeans
+
+
+def get_centroids(kmeans, cluster_vars, cluster_name):
+    # get the centroids for each distinct cluster...
+
+    centroid_col_names = ['centroid_' + i for i in cluster_vars]
+
+    centroid_df = pd.DataFrame(kmeans.cluster_centers_, 
+                               columns=centroid_col_names).reset_index().rename(columns={'index': cluster_name})
+
+    return centroid_df
+
+def cluster_plot(df):
+    '''
+    creates catplot for clusters and performs ANOVA test to determine significance
+    accepts a dataframe and cluster variables, plots log error by cluster, and prints test result
+    '''
+    
+    sns.catplot(x ="cluster",
+             y ="logerror",
+             data = df, size=5)
+    plt.title("Log Error by cluster")
+    plt.show()
+
+    cluster1 = df[df.cluster == 0]
+    cluster2 = df[df.cluster == 1]
+    cluster3 = df[df.cluster == 2]
+    cluster4 = df[df.cluster == 3]
+    cluster5 = df[df.cluster == 4]
+
+    print('H0:  The logerrors are not significantly different')
+    print('Ha:  The logerrors are significantly different')
+
+    alpha = .05
+    f, p = stats.f_oneway(cluster1.logerror, cluster2.logerror, cluster3.logerror, cluster4.logerror, cluster5.logerror) 
+    if p < alpha:
+        print("We reject the Null Hypothesis")
+    else:
+        print("We confirm the Null Hypothesis")
+
+def add_clusters(kmeans, train, validate, test, cluster_vars):
+    '''
+    function to create clusters and add one-hot encoded named columns to train,
+    validate, and test dataframes.
+    Accepts the fit kmeans, three dataframes, and a list of cluster variables
+    returns the three dataframes with named and one-hot encoded columns
+    '''
+
+    # add clusters to original train/validate/test
+    train['cluster'] = kmeans.predict(train[cluster_vars])
+    validate['cluster'] = kmeans.predict(validate[cluster_vars])
+    test['cluster'] = kmeans.predict(test[cluster_vars])
+
+    # rename clusters
+    train['cluster'] = train.cluster.map({0 : 'littlelot_lowprice',
+                                          1 : 'largelot_mediumprice',
+                                          2 : 'littlelot_highprice',
+                                          3 : 'littlelot_mediumprice'})
+
+    validate['cluster'] = validate.cluster.map({0 : 'littlelot_lowprice',
+                                                1 : 'largelot_mediumprice',
+                                                2 : 'littlelot_highprice',
+                                                3 : 'littlelot_mediumprice'})
+
+    test['cluster'] = test.cluster.map({0 : 'littlelot_lowprice',
+                                        1 : 'largelot_mediumprice',
+                                        2 : 'littlelot_highprice',
+                                        3 : 'littlelot_mediumprice'})
+
+    # One-Hot-Encode
+    dummies = pd.get_dummies(train['cluster'],drop_first=False)
+    train = pd.concat([train, dummies], axis=1)
+    train.drop(columns='cluster', inplace=True)
+
+    dummies = pd.get_dummies(validate['cluster'],drop_first=False)
+    validate = pd.concat([validate, dummies], axis=1)
+    validate.drop(columns='cluster', inplace=True)
+
+    dummies = pd.get_dummies(test['cluster'],drop_first=False)
+    test = pd.concat([test, dummies], axis=1)
+    test.drop(columns='cluster', inplace=True)
+    
+    return train, validate, test
+
+
+
