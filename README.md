@@ -1,6 +1,6 @@
 # Goals
 
-To be able to predict assessed value of of single family homes that were sold in 2017 using regression algorithms and lend insight to the data science team on how Zillow can improve their existing model- what works and what does not. 
+To be able to predict the log error of Zestimates for single family homes that were sold in 2017 using regression algorithms and lend insight to the data science team on what factors drive the log error.
 
 
 
@@ -9,75 +9,73 @@ To be able to predict assessed value of of single family homes that were sold in
 
 # Description
 
-the Zillow data science team has requested my help developing a model that uses property attributes of single family houses sold in 2017 to predict their assessed value. As the data scientist tasked with this I will use what I learn to help the Zillow data science team improve the existing predictive model.
+The Zillow data science team has requested our help developing a model that uses property attributes of single family houses sold in 2017 to predict the log error produced by their model. As the data scientists tasked with this we will use what we learn to help the Zillow data science team improve their existing predictive model.
 
 
 
 # Planning
 
-data science across all domains can usually be generalized as the following steps. I use this as a framework for making my plan.
+Data science across all domains can usually be generalized as the following steps. We used this as a framework for making our plan.
 
 Planning- writing out a timeline of actionable items, when the MVP will be finished and how to know when it is, formulate initial questions to ask the data.
 
-Acquisition- Gather my data and bring all necessary data into my python enviroment from SQL server 
+Acquisition- Gather our data and bring all necessary data into our python enviroment from the codeup SQL server 
 
-Preparation- this is blended with acquisition where I will clean and tidy the data and split into my train, validate, and test 
+Preparation- this is blended with acquisition where we clean and tidy the data and split into 60% train, 20% validate, and 20% test 
 
-Exploration/Pre-processing- where i will create visualizations and conduct hypothesis testing to select and engineer features that impact the target variable.
+Exploration/Pre-processing- where we will create visualizations and conduct hypothesis testing to select and engineer features that impact the target variable.  This includes clustering, where we will combined features to try and find meaningful insights.
 
-Modeling- based on what i learn in the exploration of the data I will select the useful features and feed into different regression models and evaluate performance of each to select my best perfomoing model.
+Modeling- based on what we learn in the exploration of the data we will select the useful features and feed them into different regression models and evaluate performance of each to select our best perfomoing model.
 
-Delivery- create a final report that succintly summarizes what I did, why I did it and what I learned in order to make recommendations
+Delivery- create a final report that succintly summarizes what we did, why we did it and what we learned in order to make recommendations
 
 
-# Initial hypothesis
+# Initial hypothesis of statistical testing
 
-## 1
-H_null= there is no correlation between number of bedrooms and assessed value
-H_a= there is a linear relationship between number of bedrooms and assessed value
+## 1 - Is the Log Error different by County?
+H_null= Average Log Error of the properties in three counties (Los Angeles, Ventura, and Orange) are all equal.
 
-## 2 
-H_null= there is no relationship between number of bathrooms and assessed value
-H_a= there is a linear relationship between number of bathrooms and assessed value
+H_a= Average Log Error of the properties in three counties (Los Angeles, Ventura, and Orange) are NOT all equal
 
-## 3
-H_null= there is no relationship between livable square feet and assessed value
-H_a= there is a linear relationship between livable square feet and assessed value
+We rejected the null hypothesis
 
-## 4
-H_null= there is no relationship between non-bed & non-bath sq ft and assessed value
-H_a= there is a linear relationship between non-bed & non-bath sq ft and assessed value
+## 2 - Does Lot Size impact log error?
+H_null= Log Error of small lots is equal to Log Error of all properties
+
+H_a= Log Error of small lots is significantly different than Log Error of all properties 
+
+We rejected the null hypothesis
 
 # Data dictionary 
 
-column name                             description
-
-bedrooms                               the number of bedrooms in the property
-
-bathrooms                              the number of bathrooms in the property
-
-area                                   the total square livable footage of the property
-
-lot_area                               the total square footage of the parcel/lot the property is on
-
-tax_value                              the assessed value imposed by the local taxing authority
-
-year_built	                           the year the home was constructed
-
-fips	                               the digit code representing what county the property is in
-
-lot_living_ratio	                   the ratio of the size of the square footage of the house in relationship to the lot sq footage
-
-non_bed_bath_area                      the total square footage of the house minus the square footage of bedrooms and bathrooms
-                                       average room sizes for that area were used then multiplied by the corresponding room count
-
-
-
+| Feature | Definition | Data Type |
+| ----- | ----- | ----- |
+| parcelid | Unique id for each property| int |
+| bathrooms| The number of bathrooms on the property | float |
+| bedrooms | The number of bedrooms on the property | float |
+| sqft | the square footage of the land | float |
+| county| The County the property is located in | string |
+| latitude | The geographical latitude of the property | float |
+| longitude | The geographical longitude of the property | float |
+| garagesqft | The area of the garage in sq ft | float |
+| lotsize | the square footage of the land | float |
+| regionidzip | the zipcode of the property | float |
+| structuretaxvalue | the value of the building on the property | float |
+| landtaxvalue | the value of the land | float |
+| logerror | the logerror of zillow's model | float |
+| age | the age of the property in years | float |
+| abserror | the absolute value of the logerror | float |
+| dollarspersqft | the assessed value per sq ft of land area | float |
+| Los Angeles | 1 if the property is in LA County | int |
+| Orange | 1 if the property is in Orange County | int |
+| Ventura | 1 if the property is in Ventura County | int |
 
 
-# how to reproduce my work
 
-To reproduce my work you will need your own env.py file in the same directory with your credentials ( host, user, password). you will also need to have my wrangle.py and evaluate.py files in the local directory for functions to work properly. with that my report will run completely from the top down. 
+
+# how to reproduce our work
+
+To reproduce our work you will need your own env.py file in the same directory with your credentials ( host, user, password).  You will also need to have our explore.py, wrangle.py and modeling.py files in the local directory for functions to work properly. With that our report will run completely from the top down. 
 
 
 
@@ -88,9 +86,7 @@ To reproduce my work you will need your own env.py file in the same directory wi
 
 # key findings and recommendations
 
-I looked at number of bedrooms, bathrooms, square footage, and square footage not included in bed or bath as features and confirmed they all have a slight statistically significant positive linear correlation. My best model performed consistently across data sets and even slightly improved in the final test data set. I expect this model will perform similarly on future data.
+We looked at location features and concluded that they did have an impact on logerror.  We also tested lotsize and found that it too had correlation to log error.  We also tested several interations of clustering features, settling on clusters that grouped lot size and taxamount. Our best model was an OLS model that performed slightly better on training data than on validate data.  This continued on test data, indicating our model is likely overfit.  We were not able to improve upon baseline (mean) RMSE with our model.  
 
-If you notice the graphs of errors in predicions there is unmistakable downward trend compared to actual values. This suggests there are other features not yet captured in my models driving that trend. My highest correlated feature to assessed value was the one I engineered.  For a business perspective I recommend incorporating my desined features into zillow's current model to increase its accuracy. 
-
-If time allowed I would like to re evaluate the zillow database for possible appropriate features to improve my model's accuracy that are not derived from square footage of the house, do some feature engineering, and rerun the predictions. While my top model surely beats the baseline I feel it is far from a huge success. much improvement is possible.
+If time allowed we would like to re evaluate the features in order to better engineer a model that can tilize the available data while avoiding overfitting.  The clusters we utilized with lot size and tax amount were significant, but further insight was likely available in bedrooms, bathrooms, and regional data.
 
