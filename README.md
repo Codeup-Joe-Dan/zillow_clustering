@@ -1,3 +1,6 @@
+# Joe Bennett & Dan Churchill - Predicting Zillow Log Error using Clustering and Linear Regression
+
+
 # Goals
 
 To be able to predict the log error of Zestimates for single family homes that were sold in 2017 using regression algorithms and lend insight to the data science team on what factors drive the log error.
@@ -88,5 +91,5 @@ To reproduce our work you will need your own env.py file in the same directory w
 
 We looked at location features and concluded that they did have an impact on logerror.  We also tested lotsize and found that it too had correlation to log error.  We also tested several interations of clustering features, settling on clusters that grouped lot size and taxamount. Our best model was an OLS model that performed slightly better on training data than on validate data.  This continued on test data, indicating our model is likely overfit.  We were not able to improve upon baseline (mean) RMSE with our model.  
 
-If time allowed we would like to re evaluate the features in order to better engineer a model that can tilize the available data while avoiding overfitting.  The clusters we utilized with lot size and tax amount were significant, but further insight was likely available in bedrooms, bathrooms, and regional data.
+If time allowed we would like to re evaluate the features in order to better engineer a model that can utilize the available data while avoiding overfitting.  The clusters we utilized with lot size and tax amount were significant, but further insight was likely available in bedrooms, bathrooms, and regional data.
 
