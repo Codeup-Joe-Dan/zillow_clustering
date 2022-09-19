@@ -135,6 +135,8 @@ def find_k(df, cluster_vars):
     #         arrowprops=dict(facecolor='red', shrink=0.05),
     #         horizontalalignment='right', verticalalignment='top',
             # )
+    #plt.ticklabel_format(style='plain')
+    plt.yticks([])
     plt.show()
 
     return 
