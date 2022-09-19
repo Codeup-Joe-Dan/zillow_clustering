@@ -201,20 +201,20 @@ def add_clusters(kmeans, train, validate, test, cluster_vars):
     test['cluster'] = kmeans.predict(test[cluster_vars])
 
     # rename clusters
-    train['cluster'] = train.cluster.map({0 : 'littlelot_lowprice',
-                                          1 : 'largelot_mediumprice',
-                                          2 : 'littlelot_highprice',
-                                          3 : 'littlelot_mediumprice'})
+    train['cluster'] = train.cluster.map({0 : 'littlelot_mediumprice',
+                                          1 : 'littlelot_highprice',
+                                          2 : 'largelot_mediumprice',
+                                          3 : 'littlelot_lowprice'})
 
-    validate['cluster'] = validate.cluster.map({0 : 'littlelot_lowprice',
-                                                1 : 'largelot_mediumprice',
-                                                2 : 'littlelot_highprice',
-                                                3 : 'littlelot_mediumprice'})
+    validate['cluster'] = validate.cluster.map({0 : 'littlelot_mediumprice',
+                                                1 : 'littlelot_highprice',
+                                                2 : 'largelot_mediumprice',
+                                                3 : 'littlelot_lowprice'})
 
-    test['cluster'] = test.cluster.map({0 : 'littlelot_lowprice',
-                                        1 : 'largelot_mediumprice',
-                                        2 : 'littlelot_highprice',
-                                        3 : 'littlelot_mediumprice'})
+    test['cluster'] = test.cluster.map({0 : 'littlelot_mediumprice',
+                                        1 : 'littlelot_highprice',
+                                        2 : 'largelot_mediumprice',
+                                        3 : 'littlelot_lowprice'})
 
     # One-Hot-Encode
     dummies = pd.get_dummies(train['cluster'],drop_first=False)
