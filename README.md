@@ -1,3 +1,6 @@
+# Joe Bennett & Dan Churchill - Predicting Zillow Log Error using Clustering and Linear Regression
+
+
 # Goals
 
 To be able to predict the log error of Zestimates for single family homes that were sold in 2017 using regression algorithms and lend insight to the data science team on what factors drive the log error.
