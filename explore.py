@@ -182,12 +182,22 @@ def cluster_plot(df):
     print('H0:  The logerrors are not significantly different')
     print('Ha:  The logerrors are significantly different')
 
-    alpha = .05
-    f, p = stats.f_oneway(cluster1.logerror, cluster2.logerror, cluster3.logerror, cluster4.logerror, cluster5.logerror) 
-    if p < alpha:
-        print("We reject the Null Hypothesis")
+    if len(cluster5) == 0:
+        alpha = .05
+        f, p = stats.f_oneway(cluster1.logerror, cluster2.logerror, cluster3.logerror, cluster4.logerror) 
+        if p < alpha:
+            print("We reject the Null Hypothesis")
+        else:
+            print("We confirm the Null Hypothesis")
+            print(p)
     else:
-        print("We confirm the Null Hypothesis")
+        alpha = .05
+        f, p = stats.f_oneway(cluster1.logerror, cluster2.logerror, cluster3.logerror, cluster4.logerror, cluster5.logerror) 
+        if p < alpha:
+            print("We reject the Null Hypothesis")
+        else:
+            print("We confirm the Null Hypothesis")
+            print(p)
 
 def add_clusters(kmeans, train, validate, test, cluster_vars):
     '''
